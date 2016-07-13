@@ -10,6 +10,7 @@ import ssl
 import sys
 import os
 
+import webhooks
 import utils
 
 class BNCBotManager(object):
@@ -291,4 +292,8 @@ class NickMask(object):
 if __name__ == "__main__":
     with open("config.json") as configfile:
         config = json.load(configfile)
+    hookhandler = webhooks.WebhookHandler(config["github_secret"])
+    t = threading.Thread(target=hookhandler.run)
+    t.daemon = True
+    t.start()
     manager = BNCBotManager(config)

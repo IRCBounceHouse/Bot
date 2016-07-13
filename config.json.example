@@ -3,6 +3,7 @@
   "zncport": 5000,
   "zncpass": "",
   "zncssl": true,
+  "github_secret": "",
   "irc": {
     "freenode": {
       "admin": true,
