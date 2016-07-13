@@ -1,6 +1,7 @@
 from flask_hookserver import Hooks
 import signal
 import flask
+import json
 import os
 
 app = flask.Flask(__name__)
@@ -13,4 +14,4 @@ def push(data, delivery):
     os.system("git pull")
     print("Bot updated. Sending SIGINT.")
     os.kill(os.getpid(), signal.SIGINT)
-    return 200
+    return json.dumps({"success": True})
