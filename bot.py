@@ -292,8 +292,8 @@ class NickMask(object):
 if __name__ == "__main__":
     with open("config.json") as configfile:
         config = json.load(configfile)
-    hookhandler = webhooks.WebhookHandler(config["github_secret"])
-    t = threading.Thread(target=hookhandler.run)
+    webhooks.app.config["GITHUB_WEBHOOKS_KEY"] = config["github_secret"]
+    t = threading.Thread(target=webhooks.app.run, args=("0.0.0.0", 8163))
     t.daemon = True
     t.start()
     manager = BNCBotManager(config)
