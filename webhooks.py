@@ -13,3 +13,4 @@ def push(data, delivery):
     os.system("git pull")
     print("Bot updated. Sending SIGINT.")
     os.kill(os.getpid(), signal.SIGINT)
+    return 200
