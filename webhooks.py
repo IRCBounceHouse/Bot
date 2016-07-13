@@ -3,7 +3,7 @@ import signal
 import flask
 import os
 
-app = flask.Flask(__main__)
+app = flask.Flask(__name__)
 hooks = Hooks(app, url="/")
 
 @hooks.hook("push")
