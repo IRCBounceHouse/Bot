@@ -1,0 +1,26 @@
+{
+  "zncaddr": "*.superbnc.com",
+  "zncport": 5000,
+  "zncpass": "",
+  "zncssl": true,
+  "irc": {
+    "freenode": {
+      "admin": true,
+      "perms": {
+        "admin": [
+          "*!*@*.staff.superbnc.com",
+          "*!*@staff.superbnc.com"
+        ]
+      }
+    },
+  }
+  "znc": {
+    "Aegir": {
+      "host": "*.superbnc.com",
+      "port": 5000,
+      "user": "",
+      "pass": "",
+      "ssl": true
+    }
+  }
+}
