@@ -190,6 +190,12 @@ class BNCBotManager(object):
             else:
                 self.send("KICK {0} {1}".format(channel, nick))
 
+        def remove(self, channel, nick, msg=None):
+            if msg:
+                self.send("REMOVE {0} {1} :{2}".format(channel, nick, msg))
+            else:
+                self.send("REMOVE {0} {1}".format(channel, nick))
+
         def handle_disconnect(self):
             self.connected = False
             print("{0} connection to {1} died, reconnecting...".format(self.type.upper(), self.name))
