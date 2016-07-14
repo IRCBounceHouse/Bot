@@ -131,7 +131,7 @@ class BNCBotManager(object):
 
     def bot_notice(self, msg):
         msgtext = "[\x02BOT NOTICE\x02] {0}".format(msg)
-        for bot in self.connections["irc"].values()
+        for bot in self.connections["irc"].values():
             bot.msg("#SuperBNC", msgtext)
 
     class BNCBot(object):
