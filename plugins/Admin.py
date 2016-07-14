@@ -14,21 +14,14 @@ def rooms(bot, event, args):
     if args == "":
         bot.reply(event, "!rooms <message>")
         return
-    for conn in bot.manager.connections["irc"].values():
-        conn.msg("#SuperBNC", "[\x02ROOMS NOTICE\x02] (from \x02{0}\x02) {1}".format(
-            event.source.nick, args))
+    bot.manager.rooms_notice(event.source.nick, args)
 
 @utils.add_cmd(command="global", perms="admin")
 def globalnotice(bot, event, args):
     if args == "":
         bot.reply(event, "!global <message>")
         return
-    for conn in bot.manager.connections["irc"].values():
-        conn.msg("#SuperBNC", "[\x02GLOBAL NOTICE\x02] (from \x02{0}\x02) {1}".format(
-            event.source.nick, args))
-    for conn in bot.manager.connections["znc"].values():
-        conn.msg("*status", "broadcast [\x02GLOBAL NOTICE\x02] (from \x02{0}\x02) {1}".format(
-            event.source.nick, args))
+    bot.manager.global_notice(event.source.nick, args)
 
 @utils.add_cmd(perms="admin")
 def relay(bot, event, args):
@@ -41,6 +34,124 @@ def relay(bot, event, args):
             irc.msg("#SuperBNC", "Relayed message from \x02{0}\x02: {1}".format(
                 event.source.nick, msg))
             break
+
+@utils.add_cmd(perms="admin")
+def netadd(bot, event, args):
+    if args == "":
+        bot.reply(event, "!netadd <name>")
+        return
+    name = args.split()[0]
+    if bot.manager.networkdb.get_net_by_name(name):
+        bot.reply(event, "Error: A network with that name already exists")
+        return
+    bot.manager.networkdb.addnet(name)
+
+@utils.add_cmd(perms="admin")
+def netaddsrv(bot, event, args):
+    if len(args.split(" ")) < 2:
+        bot.reply(event, "!netaddsrv <network> <server>")
+        return
+    args = args.split(" ")
+    netname = args[0]
+    server = args[1]
+    if bot.manager.networkdb.get_net_by_server(server):
+        bot.reply(event, "Error: That server already exists")
+        return
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not net:
+        bot.reply(event, "Error: That network does not exist")
+        return
+    bot.manager.networkdb.addserver(net["id"], server)
+
+@utils.add_cmd(perms="admin")
+def netsuspend(bot, event, args):
+    if len(args.split(" ")) < 5:
+        bot.reply(event, "!netsuspend <network> <time> "
+            "<minute(s)|hour(s)|day(s)|month(s)> <type> <reason>")
+        bot.reply(event, "Example: !netsuspend freenode 7 days session We are "
+            "currently hitting connection limits for this network")
+        return
+    timeunits = ["minute", "minutes", "hour", "hours", "day", "days",
+        "month", "months"]
+    netname, time, unit, stype, reason = args.split(" ", 4)
+    try:
+        int(time)
+    except ValueError:
+        bot.reply(event, "Error: <time> should be an integer")
+        return
+    if unit not in timeunits:
+        bot.reply(event, "Error: invalid unit of time")
+        return
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not name:
+        bot.reply(event, "Error: invalid network")
+        return
+    time = " ".join([time, unit])
+    stype = stype.upper()
+    bot.manager.networkdb.suspend(net["id"], stype, reason, time)
+    notice = []
+    if int(net["suspended"]) > 0:
+        notice.append("The suspension on the \x02{0}\x02 network has been \x02REVISED\x02.".format(net["name"]))
+    else:
+        notice.append("The \x02{0}\x02 network is now \x02SUSPENDED\x02".format(net["name"]))
+    notice.append("\x02Reason\x02: \x02{0}\x02 issues: \x02{1}\x02".format(stype, reason))
+    notice.append("\x02Duration\x02: \x02{0}\x02".format(time))
+    bot.manager.bot_notice(" ".join(notice))
+
+@utils.add_cmd(perms="admin")
+def netunsuspend(bot, event, args):
+    if args == "":
+        bot.reply(event, "!netunsuspend <network>")
+        return
+    netname = args.split()[0]
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not net:
+        bot.reply(event, "Error: invalid network")
+        return
+    if net["suspended"] == 0:
+        bot.reply(event, "Error: network is not suspended")
+        return
+    bot.manager.networkdb.unsuspend(net["id"])
+    notice = "The suspension on the \x02{0}\x02 network has been \x02CANCELLED\x02.".format(net["name"])
+    bot.manager.bot_notice(notice)
+
+@utils.add_cmd(perms="admin")
+def netban(bot, event, args):
+    if len(args.split(" ")) < 3:
+        bot.reply(event, "!netban <network> <type> <reason>")
+        bot.reply(event, "Example: !netban freenode abuse Continued abuse")
+        return
+    netname, btype, reason = args.split(" ", 2)
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not net:
+        bot.reply(event, "Error: invalid network")
+        return
+    if net["banned"] > 0:
+        bot.reply(event, "Error: network is already banned")
+        return
+    btype = btype.upper()
+    bot.manager.networkdb.ban(net["id"], btype, reason)
+    notice = []
+    notice.append("The \x02{0}\x02 network is now \x02BANNED\x02.".format(net["name"]))
+    notice.append("\x02Reason\x02: \x02{0}\x02 issues: \x02{1}\x02".format(btype, reason))
+    bot.manager.bot_notice(" ".join(notice))
+
+@utils.add_cmd(perms="admin")
+def netunban(bot, event, args):
+    if args == "":
+        bot.reply(event, "!netunban <network>")
+        return
+    netname = args.split()[0]
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not net:
+        bot.reply(event, "Error: invalid network")
+        return
+    if net["banned"] == 0:
+        bot.reply(event, "Error: network is not banned")
+        return
+    bot.manager.networkdb.unban(net["id"])
+    notice = "The ban on the \x02{0}\x02 network has been \x02CANCELLED\x02.".format(net["name"])
+    bot.manager.bot_notice(notice)
 
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):

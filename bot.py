@@ -31,6 +31,7 @@ class BNCBotManager(object):
         self.reloadplugins()
         self.mail = Mail(self.config["smtp"])
         self.requestdb = databases.RequestDB()
+        self.networkdb = databases.NetworkDB()
         for name, server in self.config["irc"].items():
             bot = self.BNCBot(
                 name=name,
@@ -116,6 +117,23 @@ class BNCBotManager(object):
                 print("New plugin: {0}".format(str(plugin)))
                 self.events = utils.events + self.events
 
+    def global_notice(self, source, msg):
+        msgtext = "[\x02GLOBAL NOTICE\x02] (from \x02{0}\x02) {1}".format(source, msg)
+        for bot in self.connections["irc"].values():
+            bot.msg("#SuperBNC", msgtext)
+        for bot in self.connections["znc"].values():
+            bot.msg("*status", "broadcast {0}".format(msgtext))
+
+    def rooms_notice(self, source, msg):
+        msgtext = "[\x02ROOMS NOTICE\x02] (from \x02{0}\x02) {1}".format(source, msg)
+        for bot in self.connections["irc"].values():
+            bot.msg("#SuperBNC", msgtext)
+
+    def bot_notice(self, msg):
+        msgtext = "[\x02BOT NOTICE\x02] {0}".format(msg)
+        for bot in self.connections["irc"].values()
+            bot.msg("#SuperBNC", msgtext)
+
     class BNCBot(object):
 
         def __init__(self, name, conntype, host, port, user, passwd, use_ssl, conf):
@@ -128,6 +146,8 @@ class BNCBotManager(object):
             self.ssl = use_ssl
             self.connected = False
             self.config = conf
+            if self.type == "ZNC":
+                self.down = False
 
         def run(self, manager):
             self.manager = manager
@@ -137,6 +157,11 @@ class BNCBotManager(object):
             try:
                 self.socket.connect((self.host, self.port))
                 self.connected = True
+                if self.type == "ZNC":
+                    if self.down:
+                        self.down = False
+                        self.manager.bot_notice(
+                            "The \x02{0}\x02 server appears to be back \x02\x033UP\x0f.".format(self.name))
             except socket.error:
                 self.handle_disconnect()
             self.send("PASS {0}".format(self.passwd))
@@ -203,8 +228,11 @@ class BNCBotManager(object):
         def handle_disconnect(self):
             self.connected = False
             print("{0} connection to {1} died, reconnecting...".format(self.type.upper(), self.name))
+            if self.type == "ZNC"
+                self.down = True
+                self.manager.bot_notice("The \x02{0}\x02 server appears to be \x02\x034DOWN\x0f.".format(self.name))
             time.sleep(10)
-            self.run()
+            self.run(self.manager)
 
         def loop(self):
             while True:
@@ -213,6 +241,7 @@ class BNCBotManager(object):
                 except socket.error:
                     self.handle_disconnect()
                 for line in data:
+                    self.manager.networkdb.expires()
                     event = Event(line)
                     t = threading.Thread(target=self.handle_event, args=(event,))
                     t.daemon = True
