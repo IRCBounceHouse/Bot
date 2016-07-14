@@ -26,7 +26,7 @@ class RequestDB(object):
                 ircnet TEXT DEFAULT NULL,
                 key TEXT
             )""")
-            c.commit()
+            self.db.commit()
             c.close()
 
     def get_by_id(self, reqid):
@@ -62,7 +62,7 @@ class RequestDB(object):
         c.execute("""INSERT INTO requests (username, email, source, server,
             port, key, ircnet) VALUES (%s, %s, %s, %s, %s, %s, %s)""", (user,
             email, src, server, port, key, ircnet))
-        c.commit()
+        self.db.commit()
         c.close()
 
     def verify(self, key):
@@ -72,7 +72,7 @@ class RequestDB(object):
             return False
         c.execute("""UPDATE requests SET status = "pending", key = NULL,
             verified_at = CURRENT_TIMESTAMP WHERE id = %s""", req["id"])
-        c.commit()
+        self.db.commit()
         c.close()
         return True
 
@@ -83,7 +83,7 @@ class RequestDB(object):
             return False
         c.execute("""UPDATE requests SET status = "accepted", bncserver = %s,
             decided_at = CURRENT_TIMESTAMP WHERE id = %s""", (bncserver, req["id"]))
-        c.commit()
+        self.db.commit()
         c.close()
         return True
 
@@ -94,6 +94,6 @@ class RequestDB(object):
             return False
         c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP
             WHERE id = %s""", req["id"])
-        c.commit()
+        self.db.commit()
         c.close()
         return True
