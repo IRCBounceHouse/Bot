@@ -31,28 +31,28 @@ class RequestDB(object):
 
     def get_by_id(self, reqid):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE id = ?", reqid)
+        c.execute("SELECT * FROM requests WHERE id = ?", (reqid,))
         req = c.fetchone()
         c.close()
         return req
 
     def get_by_key(self, key):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE key = ?", key)
+        c.execute("SELECT * FROM requests WHERE key = ?", (key,))
         req = c.fetchone()
         c.close()
         return req
 
     def get_by_user(self, username):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE username = ?", username)
+        c.execute("SELECT * FROM requests WHERE username = ?", (username,))
         reqs = c.fetchall()
         c.close()
         return reqs
 
     def get_by_email(self, email):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE email = ?", email)
+        c.execute("SELECT * FROM requests WHERE email = ?", (email,))
         reqs = c.fetchall()
         c.close()
         return reqs
@@ -71,7 +71,7 @@ class RequestDB(object):
             return False
         c = self.db.cursor()
         c.execute("""UPDATE requests SET status = "pending", key = NULL,
-            verified_at = CURRENT_TIMESTAMP WHERE id = ?""", req["id"])
+            verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
         self.db.commit()
         c.close()
         return True
@@ -93,7 +93,7 @@ class RequestDB(object):
             return False
         c = self.db.cursor()
         c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP
-            WHERE id = ?""", req["id"])
+            WHERE id = ?""", (req["id"],))
         self.db.commit()
         c.close()
         return True
@@ -129,21 +129,21 @@ class NetworkDB(object):
 
     def get_net_by_id(self, netid):
         c = self.db.cursor()
-        c.execute("SELECT * FROM networks WHERE id = ?", netid)
+        c.execute("SELECT * FROM networks WHERE id = ?", (netid,))
         net = c.fetchone()
         c.close()
         return net
 
     def get_net_by_name(self, name):
         c = self.db.cursor()
-        c.execute("SELECT * FROM networks WHERE name = ?", name)
+        c.execute("SELECT * FROM networks WHERE name = ?", (name,))
         net = c.fetchone()
         c.close()
         return net
 
     def get_net_by_server(self, addr):
         c = self.db.cursor()
-        c.execute("SELECT network_id FROM servers WHERE ? LIKE address", addr)
+        c.execute("SELECT network_id FROM servers WHERE ? LIKE address", (addr,))
         netid = c.fetchone()
         if not netid:
             c.close()
@@ -155,7 +155,7 @@ class NetworkDB(object):
         if self.get_net_by_name(name):
             return False
         c = self.db.cursor()
-        c.execute("INSERT INTO networks (name) VALUES (?)", name)
+        c.execute("INSERT INTO networks (name) VALUES (?)", (name,))
         self.db.commit()
         c.close()
         return True
@@ -186,7 +186,7 @@ class NetworkDB(object):
         if not self.get_net_by_id(netid):
             return False
         c = self.db.cursor()
-        c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", netid)
+        c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", (netid,))
         self.db.commit()
         c.close()
         return True
@@ -211,7 +211,7 @@ class NetworkDB(object):
         if not self.get_net_by_id(netid):
             return False
         c = self.db.cursor()
-        c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", netid)
+        c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", (netid,))
         self.db.commit()
         c.close()
         return True
