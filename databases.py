@@ -145,13 +145,13 @@ class NetworkDB(object):
 
     def get_net_by_server(self, addr):
         c = self.db.cursor()
-        c.execute("SELECT network_id FROM servers WHERE (?) LIKE address", (addr,))
+        c.execute("SELECT network_id FROM servers WHERE ? LIKE address", (addr,))
         netid = c.fetchone()
         if not netid:
             c.close()
             return None
         c.close()
-        return self.get_net_by_id(netid)
+        return self.get_net_by_id(netid["network_id"])
 
     def addnet(self, name):
         if self.get_net_by_name(name):
