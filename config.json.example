@@ -24,4 +24,13 @@
       "ssl": true
     }
   }
+  "smtp": {
+    "host": "",
+    "port": 587,
+    "user": "",
+    "pass": "",
+    "ssl": false,
+    "starttls": true,
+    "from": ""
+  }
 }

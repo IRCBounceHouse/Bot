@@ -10,6 +10,7 @@ import ssl
 import sys
 import os
 
+from mail import Mail
 import webhooks
 import utils
 
@@ -27,6 +28,7 @@ class BNCBotManager(object):
         self.mtimes = {}
         print("Loading plugins")
         self.reloadplugins()
+        self.mail = Mail(self.config["smtp"])
         for name, server in self.config["irc"].items():
             bot = self.BNCBot(
                 name=name,
