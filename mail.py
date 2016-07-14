@@ -16,7 +16,7 @@ class Mail(object):
             self.smtp = smtplib.SMTP_SSL(self.host, self.port)
         else:
             self.smtp = smtplib.SMTP(self.host, self.port)
-            if starttls:
+            if self.starttls:
                 self.smtp.starttls()
         self.smtp.login(self.user, self.passwd)
 
