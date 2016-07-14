@@ -1,5 +1,6 @@
 from email.mime.text import MIMEText
 import email.utils
+import textwrap
 import smtplib
 
 class Mail(object):
@@ -25,7 +26,7 @@ class Mail(object):
 
     def send(self, toaddrs, subject, body):
         self.connect()
-        msg = MIMEText(body)
+        msg = MIMEText(textwrap.dedent(body))
         msg["From"] = self.fromaddr
         if type(toaddrs) is list:
             msg["To"] = ", ".join(toaddrs)
@@ -38,16 +39,16 @@ class Mail(object):
 
     def verify(self, toaddr, code):
         msg = """
-            Hi,
+        Hi,
 
-            To confirm your SuperBNC account request, send the following in one of our channels.
+        To confirm your SuperBNC account request, send the following in one of our channels.
 
-            !verify {0}
+        !verify {0}
 
-            Thanks for choosing SuperBNC.
+        Thanks for choosing SuperBNC.
 
-            Regards,
-            SuperBNC Team
-            support@superbnc.com
+        Regards,
+        SuperBNC Team
+        support@superbnc.com
         """.format(code)
         self.send(toaddr, "SuperBNC account verification", msg)
