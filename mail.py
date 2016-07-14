@@ -26,7 +26,7 @@ class Mail(object):
 
     def send(self, toaddrs, subject, body):
         self.connect()
-        msg = MIMEText(textwrap.dedent(body))
+        msg = MIMEText(textwrap.dedent(body.strip()))
         msg["From"] = self.fromaddr
         if type(toaddrs) is list:
             msg["To"] = ", ".join(toaddrs)

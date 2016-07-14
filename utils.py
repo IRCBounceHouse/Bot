@@ -1,4 +1,7 @@
 import collections
+import hashlib
+import json
+import os
 
 events = []
 
@@ -21,3 +24,6 @@ def add_trigger(func=None, **kwargs):
     if isinstance(func, collections.Callable):
         return wrapper(func)
     return wrapper
+
+def genkey():
+    return hashlib.md5(os.urandom(27)).hexdigest()

@@ -258,8 +258,8 @@ class BNCBotManager(object):
                             commandargs = " ".join([command, args])
                         else:
                             commandargs = command
-                        print("({0}) {1} called '{2}' in {3}".format(
-                            self.name, event.source, commandargs, chan))
+                        print("({0}) {1} called {2} in {3}".format(
+                            self.name, event.source, repr(commandargs), chan))
                         func(self, event, args)
 
         def hasperm(self, perm, mask):
@@ -321,6 +321,8 @@ class NickMask(object):
 if __name__ == "__main__":
     with open("config.json") as configfile:
         config = json.load(configfile)
+    if not os.path.exists(os.path.join(os.getcwd(), "data")):
+        os.mkdir(os.path.join(os.getcwd(), "data"))
     webhooks.app.config["GITHUB_WEBHOOKS_KEY"] = config["github_secret"]
     t = threading.Thread(target=webhooks.app.run, args=("0.0.0.0", 8163))
     t.daemon = True
