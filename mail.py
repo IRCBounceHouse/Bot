@@ -12,7 +12,7 @@ class Mail(object):
         self.ssl = self.config.get("ssl", False)
         self.starttls = self.config.get("starttls", False)
         self.fromaddr = self.config.get("from", self.user)
-        if ssl:
+        if self.ssl:
             self.smtp = smtplib.SMTP_SSL(self.host, self.port)
         else:
             self.smtp = smtplib.SMTP(self.host, self.port)
