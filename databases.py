@@ -9,6 +9,7 @@ class RequestDB(object):
         self.path = os.path.join(os.getcwd(), "data", "requests.db")
         exists = os.path.exists(self.path)
         self.db = sqlite3.connect(self.path, check_same_thread=False)
+        self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
             c.execute("""CREATE TABLE requests (
@@ -104,6 +105,7 @@ class NetworkDB(object):
         self.path = os.path.join(os.getcwd(), "data", "networks.db")
         exists = os.path.exists(self.path)
         self.db = sqlite3.connect(self.path, check_same_thread=False)
+        self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
             c.execute("""CREATE TABLE networks (
