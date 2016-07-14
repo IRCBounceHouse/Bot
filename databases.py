@@ -13,7 +13,7 @@ class RequestDB(object):
         if not exists:
             c = self.db.cursor()
             c.execute("""CREATE TABLE requests (
-                id INT PRIMARY KEY NOT NULL,
+                id INTEGER PRIMARY KEY NOT NULL,
                 username TEXT NOT NULL,
                 email TEXT NOT NULL,
                 source TEXT NOT NULL,
@@ -109,7 +109,7 @@ class NetworkDB(object):
         if not exists:
             c = self.db.cursor()
             c.execute("""CREATE TABLE networks (
-                id INT PRIMARY KEY,
+                id INTEGER PRIMARY KEY,
                 name TEXT NOT NULL UNIQUE,
                 suspended INT DEFAULT 0 NOT NULL,
                 suspendtype TEXT,
@@ -122,7 +122,7 @@ class NetworkDB(object):
                 banned_at TIMESTAMP DEFAULT NULL
             )""")
             c.execute("""CREATE TABLE servers (
-                id INT PRIMARY KEY,
+                id INTEGER PRIMARY KEY,
                 address TEXT NOT NULL UNIQUE,
                 network_id INT NOT NULL
             )""")
