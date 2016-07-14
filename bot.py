@@ -228,7 +228,7 @@ class BNCBotManager(object):
         def handle_disconnect(self):
             self.connected = False
             print("{0} connection to {1} died, reconnecting...".format(self.type.upper(), self.name))
-            if self.type == "ZNC"
+            if self.type == "ZNC":
                 self.down = True
                 self.manager.bot_notice("The \x02{0}\x02 server appears to be \x02\x034DOWN\x0f.".format(self.name))
             time.sleep(10)
