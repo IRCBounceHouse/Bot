@@ -13,6 +13,8 @@ class Mail(object):
         self.ssl = self.config.get("ssl", False)
         self.starttls = self.config.get("starttls", False)
         self.fromaddr = self.config.get("from", self.user)
+
+    def connect(self):
         if self.ssl:
             self.smtp = smtplib.SMTP_SSL(self.host, self.port)
         else:
@@ -22,6 +24,7 @@ class Mail(object):
         self.smtp.login(self.user, self.passwd)
 
     def send(self, toaddrs, subject, body):
+        self.connect()
         msg = MIMEText(body)
         msg["From"] = self.fromaddr
         if type(toaddrs) is list:
@@ -31,6 +34,7 @@ class Mail(object):
         msg["Subject"] = subject
         msg["Date"] = email.utils.formatdate()
         self.smtp.send_message(msg)
+        self.smtp.quit()
 
     def verify(self, toaddr, code):
         msg = """
