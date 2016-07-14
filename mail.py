@@ -1,4 +1,5 @@
 from email.mime.text import MIMEText
+import email.utils
 import smtplib
 
 class Mail(object):
@@ -28,6 +29,7 @@ class Mail(object):
         else:
             msg["To"] = toaddrs
         msg["Subject"] = subject
+        msg["Date"] = email.utils.formatdate()
         self.smtp.send_message(msg)
 
     def verify(self, toaddr, code):
