@@ -168,6 +168,7 @@ class NetworkDB(object):
     def get_net_defaults(self, netid):
         if not self.get_net_by_id(netid):
             return False
+        c = self.db.cursor()
         c.execute("SELECT * FROM defaults WHERE network_id = ?", (netid,))
         defaults = c.fetchall()
         c.close()
