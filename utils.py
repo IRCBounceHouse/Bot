@@ -1,5 +1,7 @@
 import collections
 import hashlib
+import random
+import string
 import json
 import os
 
@@ -27,3 +29,7 @@ def add_trigger(func=None, **kwargs):
 
 def genkey():
     return hashlib.md5(os.urandom(27)).hexdigest()
+
+def genpasswd():
+    alphanumeric = string.ascii_letters + string.digits
+    return "".join([random.choice(alphanumeric) for _ in range(16)])

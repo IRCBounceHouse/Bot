@@ -1,8 +1,6 @@
 import sqlite3
 import os
 
-import utils
-
 class RequestDB(object):
 
     def __init__(self):
@@ -24,8 +22,9 @@ class RequestDB(object):
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 verified_at TIMESTAMP DEFAULT NULL,
                 decided_at TIMESTAMP DEFAULT NULL,
-                bncserver TEXT DEFAULT NULL,
-                key TEXT
+                decided_by TEXT DEFAULT NULL,
+                reason TEXT DEFAULT NULL,
+                bncserver TEXT DEFAULT NULL
             )""")
             self.db.commit()
             c.close()
@@ -66,38 +65,46 @@ class RequestDB(object):
         self.db.commit()
         c.close()
 
-    def verify(self, key):
-        req = self.get_by_key(key)
+    def verify(self, reqid):
+        req = self.get_by_id(reqid)
         if not req:
             return False
         c = self.db.cursor()
-        c.execute("""UPDATE requests SET status = "pending", key = NULL,
+        c.execute("""UPDATE requests SET status = "pending",
             verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
         self.db.commit()
         c.close()
         return True
 
-    def accept(self, reqid, bncserver):
+    def accept(self, reqid, source, bncserver):
         req = self.get_by_id(reqid)
         if not req:
             return False
         c = self.db.cursor()
         c.execute("""UPDATE requests SET status = "accepted", bncserver = ?,
-            decided_at = CURRENT_TIMESTAMP WHERE id = ?""", (bncserver, req["id"]))
+            decided_at = CURRENT_TIMESTAMP, decided_by = ? WHERE id = ?""",
+            (bncserver, source req["id"]))
         self.db.commit()
         c.close()
         return True
 
-    def reject(self, reqid):
+    def reject(self, reqid, source, reason):
         req = self.get_by_id(reqid)
         if not req:
             return False
         c = self.db.cursor()
-        c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP
-            WHERE id = ?""", (req["id"],))
+        c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP,
+            decided_by = ?, reason = ? WHERE id = ?""", (source, reason, req["id"]))
         self.db.commit()
         c.close()
         return True
+
+    def expires(self):
+        c = self.db.cursor()
+        c.execute("""DELETE FROM requests WHERE status = "unverified" AND
+            datetime(created_at, "+1 day") < CURRENT_TIMESTAMP""")
+        self.db.commit()
+        c.close()
 
 class NetworkDB(object):
 
@@ -245,3 +252,52 @@ class NetworkDB(object):
         self.db.commit()
         c.close()
         return True
+
+class VerifyDB(object):
+
+    def __init__(self):
+        self.path = os.path.join(os.getcwd(), "data", "verify.db")
+        exists = os.path.exists(self.path)
+        self.db = sqlite3.connect(self.path)
+        self.db.row_factory = sqlite3.Row
+        if not exists:
+            c = self.db.cursor()
+            c.execute("""CREATE TABLE keys (
+                id INTEGER PRIMARY KEY,
+                key TEXT NOT NULL UNIQUE,
+                command TEXT NOT NULL,
+                action_id INT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+            )""")
+            self.db.commit()
+            c.close()
+
+    def add(self, key, cmd, actid):
+        if self.get_by_key(key):
+            return False
+        c = self.db.cursor()
+        c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",
+            (key, cmd, actid))
+        c.close()
+        return True
+
+    def used(self, key):
+        if not self.get_by_key(key):
+            return False
+        c = self.db.cursor()
+        c.execute("DELETE FROM keys WHERE key = ?", (key,))
+        c.close()
+        return True
+
+    def get_by_key(self, key):
+        c = self.db.cursor()
+        c.execute("SELECT * FROM keys WHERE key = ?", (key,))
+        data = c.fetchone()
+        c.close()
+        return data
+
+    def expires(self):
+        c = self.db.cursor()
+        c.execute("DELETE FROM keys WHERE datetime(created_at, \"+1 day\") > CURRENT_TIMESTAMP")
+        self.db.commit()
+        c.close()
