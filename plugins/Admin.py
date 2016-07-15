@@ -185,7 +185,7 @@ def adduser(bot, event, args):
     username = args[1]
     network = args[2]
     for name in bot.manager.connections["znc"]:
-        if name.lower() == server.lower()
+        if name.lower() == server.lower():
             server = name
             break
     else:
