@@ -258,7 +258,7 @@ class VerifyDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "verify.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path)
+        self.db = sqlite3.connect(self.path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
