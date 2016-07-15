@@ -64,6 +64,27 @@ def netaddsrv(bot, event, args):
     bot.manager.networkdb.addserver(net["id"], server)
 
 @utils.add_cmd(perms="admin")
+def netdefault(bot, event, args):
+    if len(args.split(" ")) < 3:
+        bot.reply(event, "!netdefault <network> <server> [+]<port>")
+        return
+    args = args.split(" ")
+    netname = args[0]
+    server = args[1]
+    port = args[2]
+    net = bot.manager.networkdb.get_net_by_name(netname)
+    if not net:
+        bot.reply(event, "Error: invalid network")
+        return
+    try:
+        int(port.replace("+", "", 1))
+    except ValueError:
+        bot.reply(event, "Error: invalid port")
+        return
+    if not bot.manager.networkdb.defaultadd(net["id"], server, port):
+        bot.reply(event, "Error: server already exists")
+
+@utils.add_cmd(perms="admin")
 def netsuspend(bot, event, args):
     if len(args.split(" ")) < 5:
         bot.reply(event, "!netsuspend <network> <time> "

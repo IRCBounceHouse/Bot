@@ -19,7 +19,7 @@ class RequestDB(object):
                 source TEXT NOT NULL,
                 status TEXT DEFAULT "unverified" NOT NULL,
                 server TEXT NOT NULL,
-                port INT NOT NULL,
+                port TEXT NOT NULL,
                 ircnet TEXT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
                 verified_at TIMESTAMP DEFAULT NULL,
@@ -39,21 +39,21 @@ class RequestDB(object):
 
     def get_by_key(self, key):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE key = ?", (key,))
+        c.execute("SELECT * FROM requests WHERE key = ? COLLATE NOCASE", (key,))
         req = c.fetchone()
         c.close()
         return req
 
     def get_by_user(self, username):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE username = ?", (username,))
+        c.execute("SELECT * FROM requests WHERE username = ? COLLATE NOCASE", (username,))
         reqs = c.fetchall()
         c.close()
         return reqs
 
     def get_by_email(self, email):
         c = self.db.cursor()
-        c.execute("SELECT * FROM requests WHERE email = ?", (email,))
+        c.execute("SELECT * FROM requests WHERE email = ? COLLATE NOCASE", (email,))
         reqs = c.fetchall()
         c.close()
         return reqs
@@ -126,6 +126,12 @@ class NetworkDB(object):
                 address TEXT NOT NULL UNIQUE,
                 network_id INT NOT NULL
             )""")
+            c.execute("""CREATE TABLE defaults (
+                id INTEGER PRIMARY KEY,
+                address TEXT NOT NULL UNIQUE,
+                port TEXT NOT NULL,
+                network_id NOT NULL
+            )""")
             self.db.commit()
             c.close()
 
@@ -138,7 +144,7 @@ class NetworkDB(object):
 
     def get_net_by_name(self, name):
         c = self.db.cursor()
-        c.execute("SELECT * FROM networks WHERE name = ?", (name,))
+        c.execute("SELECT * FROM networks WHERE name = ? COLLATE NOCASE", (name,))
         net = c.fetchone()
         c.close()
         return net
@@ -152,6 +158,14 @@ class NetworkDB(object):
             return None
         c.close()
         return self.get_net_by_id(netid["network_id"])
+
+    def get_net_defaults(self, netid):
+        if not self.get_net_by_id(netid):
+            return False
+        c.execute("SELECT * FROM defaults WHERE network_id = ?", (netid,))
+        defaults = c.fetchall()
+        c.close()
+        return defaults
 
     def addnet(self, name):
         if self.get_net_by_name(name):
@@ -168,6 +182,20 @@ class NetworkDB(object):
         c = self.db.cursor()
         c.execute("INSERT INTO servers (address, network_id) VALUES (?, ?)",
             (addr, netid))
+        self.db.commit()
+        c.close()
+        return True
+
+    def defaultadd(self, netid, addr, port):
+        if not self.get_net_by_id(netid):
+            return False
+        c = self.db.cursor()
+        c.execute("SELECT * FROM defaults WHERE address = ?", (addr,))
+        if c.fetchone():
+            c.close()
+            return False
+        c.execute("INSERT INTO defaults (address, port, network_id) VALUES (?, ?, ?)",
+            (addr, port, netid))
         self.db.commit()
         c.close()
         return True
