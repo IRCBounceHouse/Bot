@@ -83,7 +83,7 @@ class RequestDB(object):
         c = self.db.cursor()
         c.execute("""UPDATE requests SET status = "accepted", bncserver = ?,
             decided_at = CURRENT_TIMESTAMP, decided_by = ? WHERE id = ?""",
-            (bncserver, source req["id"]))
+            (bncserver, source, req["id"]))
         self.db.commit()
         c.close()
         return True
