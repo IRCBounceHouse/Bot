@@ -195,7 +195,7 @@ def adduser(bot, event, args):
     if not net:
         bot.reply(event, "Error: invalid network")
         return
-    servers = bot.manager.get_net_defaults(net["id"])
+    servers = bot.manager.networkdb.get_net_defaults(net["id"])
     if not servers:
         bot.reply(event, "Error: no servers for network")
         return
@@ -204,6 +204,7 @@ def adduser(bot, event, args):
     bot.manager.add_net(server, username, net["name"])
     for srv in servers:
         bot.manager.add_server(server, username, network, srv["address"], srv["port"])
+    bot.reply(event, "Added! Password is: {0}".format(passwd))
 
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):
