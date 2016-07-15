@@ -103,7 +103,6 @@ class RequestDB(object):
         c = self.db.cursor()
         c.execute("""DELETE FROM requests WHERE status = "unverified" AND
             datetime(created_at, "+1 day") < CURRENT_TIMESTAMP""")
-        self.db.commit()
         c.close()
 
 class NetworkDB(object):
@@ -299,5 +298,4 @@ class VerifyDB(object):
     def expires(self):
         c = self.db.cursor()
         c.execute("DELETE FROM keys WHERE datetime(created_at, \"+1 day\") > CURRENT_TIMESTAMP")
-        self.db.commit()
         c.close()
