@@ -172,6 +172,7 @@ class BNCBotManager(object):
             self.connected = False
             self.config = conf
             self.down = False
+            self.debug = False
 
         def run(self, manager):
             self.manager = manager
@@ -198,6 +199,8 @@ class BNCBotManager(object):
         def send(self, text):
             if self.connected:
                 self.socket.send("{0}\r\n".format(text).encode())
+                if self.debug:
+                    print("[SEND][{0}]({1}) {2}".format(self.type, self.name, text))
 
         def recv(self):
             part = ""
@@ -282,6 +285,8 @@ class BNCBotManager(object):
                             t = threading.Thread(target=func, args=(self, event))
                             t.daemon = True
                             t.start()
+                    if self.debug:
+                        print("[RECV][{0}]({1}) {2}".format(self.type, self.name, line))
 
         def handle_event(self, event):
             if event.type == "PING":
