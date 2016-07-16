@@ -295,8 +295,9 @@ class BNCBotManager(object):
                 self.lastping = time.time()
             elif event.type == "001":
                 self.lastping = time.time()
-                self.ping_timer = threading.Timer(30, self.ping)
-                self.ping_timer.start()
+                self.ping_thread = threading.Thread(target=self.ping)
+                self.ping_thread.daemon = True
+                self.ping_thread.start()
             elif event.type == "PRIVMSG":
                 if str(event.source) == "*status!bnc@superbnc.com":
                     if event.arguments[0].startswith("Disconnected from IRC.") and not self.down:
@@ -315,11 +316,13 @@ class BNCBotManager(object):
                 self.handle_command(command, event, args)
 
         def ping(self):
-            diff = time.time() - self.lastping
-            if diff > 90:
-                self.quit("Lag: {0} seconds".format(int(diff)))
-            else:
-                self.send("PING :{0}".format(time.time()))
+            while self.connected:
+                diff = time.time() - self.lastping
+                if diff > 90:
+                    self.quit("Lag: {0} seconds".format(int(diff)))
+                else:
+                    self.send("PING :{0}".format(time.time()))
+                sleep(30)
 
         def handle_command(self, command, event, args):
             for func in [e for e in self.manager.events if e._event == "command"]:
