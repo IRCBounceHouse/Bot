@@ -322,7 +322,7 @@ class BNCBotManager(object):
                     self.quit("Lag: {0} seconds".format(int(diff)))
                 else:
                     self.send("PING :{0}".format(time.time()))
-                sleep(30)
+                time.sleep(30)
 
         def handle_command(self, command, event, args):
             for func in [e for e in self.manager.events if e._event == "command"]:
