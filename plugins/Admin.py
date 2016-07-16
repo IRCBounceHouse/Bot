@@ -176,7 +176,6 @@ def netunban(bot, event, args):
 
 @utils.add_cmd(perms="admin")
 def adduser(bot, event, args):
-    "!adduser Aegir TestUser freenode"
     if len(args.split(" ")) < 3:
         bot.reply(event, "!adduser <server> <username> <network>")
         return
@@ -205,6 +204,35 @@ def adduser(bot, event, args):
     for srv in servers:
         bot.manager.add_server(server, username, network, srv["address"], srv["port"])
     bot.reply(event, "Added! Password is: {0}".format(passwd))
+
+@utils.add_cmd(perms="admin")
+def addusernet(bot, event, args):
+    if len(args.split(" ")) < 3:
+        bot.reply(event, "!addusernet <server> <username> <network>")
+        return
+    args = args.split(" ")
+    server = args[0]
+    username = args[1]
+    network = args[2]
+    for name in bot.manager.connections["znc"]:
+        if name.lower() == server.lower():
+            server = name
+            break
+    else:
+        bot.reply(event, "Error: invalid server")
+        return
+    net = bot.manager.networkdb.get_net_by_name(network)
+    if not net:
+        bot.reply(event, "Error: invalid network")
+        return
+    servers = bot.manager.networkdb.get_net_defaults(net["id"])
+    if not servers:
+        bot.reply(event, "Error: no servers for network")
+        return
+    bot.manager.add_net(server, username, net["name"])
+    for srv in servers:
+        bot.manager.add_server(server, username, network, srv["address"], srv["port"])
+    bot.reply(event, "Added!")
 
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):
