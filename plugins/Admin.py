@@ -249,7 +249,7 @@ def pending(bot, event, args):
 @utils.add_cmd
 def accept(bot, event, args):
     if len(args.split(" ")) < 2:
-        bot.reply(event "!accept <id> <server>")
+        bot.reply(event, "!accept <id> <server>")
         return
     args = args.split(" ")
     reqid = args[0]
