@@ -234,6 +234,77 @@ def addusernet(bot, event, args):
         bot.manager.add_server(server, username, network, srv["address"], srv["port"])
     bot.reply(event, "Added!")
 
+@utils.add_cmd(perms="admin")
+def pending(bot, event, args):
+    reqs = bot.manager.requestdb.get_pending()
+    if not req:
+        bot.reply(event, "No requests are currently pending")
+        return
+    for req in reqs:
+        net = bot.manager.networkdb.get_net_by_server(req["server"])
+        bot.reply(event, "\x02ID\x02: \x02{0} Username\x02: \x02{1} Server\x02: \x02{2}\x02 "
+            "[\x02{3}\x02] \x02Email\x02: \x02{4} Source\x02: \x02{5}\x02".format(
+            req["id"], req["username"], req["server"], net["name"], req["email"], req["source"]))
+
+@utils.add_cmd
+def accept(bot, event, args):
+    if len(args.split(" ")) < 2:
+        bot.reply(event "!accept <id> <server>")
+        return
+    args = args.split(" ")
+    reqid = args[0]
+    server = args[1]
+    req = bot.manager.requestdb.get_by_id(reqid)
+    if not req:
+        bot.reply(event, "Error: invalid request ID")
+        return
+    if req["status"] != "pending":
+        bot.reply(event, "Error: you may only accept pending requests")
+        return
+    net = bot.manager.networkdb.get_net_by_server(req["server"])
+    if not net:
+        bot.reply(event, "Error: no network could be determined, please add "
+            "the network to this bot's database before accepting the request")
+        return
+    for name in bot.manager.connections["znc"]:
+        if name.lower() == server.lower():
+            server = name
+    else:
+        bot.reply(event, "Error: invalid server")
+        return
+    bot.manager.requestdb.accept(req["id"], event.source.nick, server)
+    passwd = utils.genpasswd()
+    bot.manager.add_user(server, req["username"], passwd)
+    bot.manager.add_net(server, req["username"], net["name"])
+    if req["port"] == "default":
+        for srv in bot.manager.networkdb.get_net_defaults(net["id"]):
+            bot.manager.add_server(server, req["username"], net["name"], srv["address"], srv["port"])
+    else:
+        bot.manager.add_server(server, req["username"], net["name"], req["server"], req["port"])
+    bot.manager.mail.accept(req["email"], bot.manager.connections["znc"][server]["host"],
+        req["username"], passwd, net["name"])
+    bot.manager.connections["irc"][req["ircnet"]].msg("#SuperBNC", "\x02\x033Request ACCEPTED\x0f. "
+        "\x02Username\x02: \x02{0} Network\x02: \x02{1} Server\x02: \x02{2} "
+        "Accepted by\x02: \x02{3}\x02".format(req["username"], net["name"], server, event.source.nick))
+
+@utils.add_cmd
+def reject(bot, event, args):
+    if len(args.split(" ")) < 2:
+        bot.reply(event, "!reject <id> <reason>")
+        return
+    reqid, reason = args.split(" ", 1)
+    req = bot.manager.requestdb.get_by_id(reqid)
+    if not req:
+        bot.reply(event, "Error: invalid request ID")
+        return
+    if req["status"] != "pending":
+        bot.reply(event, "Error: you may only reject pending requests")
+        return
+    bot.manager.requestdb.reject(req["id"], event.source.nick, reason)
+    bot.manager.mail.reject(req["email"], reason)
+    bot.manager.connections["irc"][req["ircnet"]].msg("#SuperBNC", "\x02\x034Request REJECTED\x0f. "
+        "\x02Username\x02: \x02{0} Reason\x02: \x02{1}\x02".format(req["username"], reason))
+
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):
     pyenv = Repl({

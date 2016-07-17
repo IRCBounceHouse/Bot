@@ -57,11 +57,18 @@ class RequestDB(object):
         c.close()
         return reqs
 
-    def add(self, user, email, src, server, port, key, net):
+    def get_pending(self):
+        c = self.db.cursor()
+        c.execute("SELECT * FROM requests WHERE status= \"pending\"")
+        reqs = c.fetchall()
+        c.close()
+        return reqs
+
+    def add(self, user, email, src, server, port, net):
         c = self.db.cursor()
         c.execute("""INSERT INTO requests (username, email, source, server,
-            port, key, ircnet) VALUES (?, ?, ?, ?, ?, ?, ?)""", (user,
-            email, src, server, port, key, ircnet))
+            port, key, ircnet) VALUES (?, ?, ?, ?, ?, ?)""", (user, email,
+            src, server, port, ircnet))
         self.db.commit()
         c.close()
 

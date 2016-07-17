@@ -52,3 +52,38 @@ class Mail(object):
         support@superbnc.com
         """.format(code)
         self.send(toaddr, "SuperBNC account verification", msg)
+
+    def accept(self, toaddr, server, user, passwd, net):
+        msg = """
+        Hi,
+
+        Your SuperBNC account request has been accepted. Your account details are:
+
+        BNC Server: {0}
+        Username: {1}
+        Password: {2}
+        IRC Network: {3}
+
+        Thanks for choosing SuperBNC.
+
+        Regards,
+        SuperBNC Team
+        support@superbnc.com
+        """.format(server, user, passwd, net)
+        self.send(toaddr, "Your SuperBNC account details", msg)
+
+    def reject(self, toaddr, reason):
+        msg = """
+        Hi,
+
+        Your SuperBNC account request has been rejected. The reason given was:
+
+        {0}
+
+        If you would like to discuss this, please email us at support@superbnc.com
+
+        Regards,
+        SuperBNC Team
+        support@superbnc.com
+        """.format(reason)
+        self.send(toaddr, "SuperBNC request rejected", msg)
