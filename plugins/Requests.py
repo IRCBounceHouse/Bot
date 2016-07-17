@@ -61,7 +61,7 @@ def request(bot, event, args):
             if requser["status"] != "rejected":
                 bot.reply(event, "\x02Error\x02: There is already a request with this username")
                 return
-    reqemails = bot.manager.requestdb.get_by_email(email):
+    reqemails = bot.manager.requestdb.get_by_email(email)
     if reqemails:
         for reqemail in reqemails:
             if reqemail["status"] != "rejected":
