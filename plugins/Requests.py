@@ -52,7 +52,7 @@ def request(bot, event, args):
         server = defaults[0]["address"]
         port = "default"
         email = args[2]
-    if not "@" in email:
+    if "@" not in email:
         bot.reply(event, "\x02Error\x02: Invalid email specified")
         return
     requsers = bot.manager.requestdb.get_by_user(username)
@@ -74,6 +74,16 @@ def request(bot, event, args):
     bot.manager.mail.verify(email, key)
     bot.reply(event, "\x02You have completed the first step!\x02 Please follow the instructions sent to "
         "the email address you specified to verify your request.")
+
+@utils.add_cmd
+def easyreq(bot, event, args):
+    if args == "":
+        bot.reply(event, "\x02Syntax\x02: \x02!easyreq <email>\x02")
+        bot.reply(event, "This will make a request for this network using your current nick "
+            "as the username")
+        return
+    email = args.split(" ")[0]
+    request(bot, event, "{0} {1} {2}".format(event.source.nick, bot.name, email))
 
 @utils.add_cmd
 def verify(bot, event, args):
