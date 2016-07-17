@@ -83,7 +83,7 @@ def easyreq(bot, event, args):
             "as the username")
         return
     email = args.split(" ")[0]
-    request(bot, event, "{0} {1} {2}".format(event.source.nick, bot.name, email))
+    bot.handle_command("!request", event, "{0} {1} {2}".format(event.source.nick, bot.name, email))
 
 @utils.add_cmd
 def verify(bot, event, args):

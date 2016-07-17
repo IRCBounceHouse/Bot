@@ -286,7 +286,8 @@ class VerifyDB(object):
             return False
         c = self.db.cursor()
         c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",
-            (key, cmd, int(actid)))
+            (key, cmd, actid))
+        self.db.commit()
         c.close()
         return True
 
