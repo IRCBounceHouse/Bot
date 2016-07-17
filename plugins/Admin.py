@@ -242,9 +242,13 @@ def pending(bot, event, args):
         return
     for req in reqs:
         net = bot.manager.networkdb.get_net_by_server(req["server"])
-        bot.reply(event, "\x02ID\x02: \x02{0} Username\x02: \x02{1} Server\x02: \x02{2}\x02 "
-            "[\x02{3}\x02] \x02Email\x02: \x02{4} Source\x02: \x02{5}\x02".format(
-            req["id"], req["username"], req["server"], net["name"], req["email"], req["source"]))
+        reqdata = []
+        reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
+        reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
+        reqdata.append("\x02Server\x02: \x02{0}\x02 [\x02{1}\x02]".format(req["server"], net["name"]))
+        reqdata.append("\x02Email\x02: \x02{0}\x02".format(req["email"]))
+        reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
+        bot.reply(event, ", ".join(reqdata))
 
 @utils.add_cmd
 def accept(bot, event, args):
@@ -284,8 +288,8 @@ def accept(bot, event, args):
     bot.manager.mail.accept(req["email"], bot.manager.connections["znc"][server]["host"],
         req["username"], passwd, net["name"])
     bot.manager.connections["irc"][req["ircnet"]].msg("#SuperBNC", "\x02\x033Request ACCEPTED\x0f. "
-        "\x02Username\x02: \x02{0} Network\x02: \x02{1} Server\x02: \x02{2} "
-        "Accepted by\x02: \x02{3}\x02".format(req["username"], net["name"], server, event.source.nick))
+        "\x02Username\x02: \x02{0}\x02, \x02Network\x02: \x02{1}\x02, \x02Server\x02: \x02{2}\x02, "
+        "\x02Accepted by\x02: \x02{3}\x02".format(req["username"], net["name"], server, event.source.nick))
 
 @utils.add_cmd
 def reject(bot, event, args):
@@ -303,7 +307,7 @@ def reject(bot, event, args):
     bot.manager.requestdb.reject(req["id"], event.source.nick, reason)
     bot.manager.mail.reject(req["email"], reason)
     bot.manager.connections["irc"][req["ircnet"]].msg("#SuperBNC", "\x02\x034Request REJECTED\x0f. "
-        "\x02Username\x02: \x02{0} Reason\x02: \x02{1}\x02".format(req["username"], reason))
+        "\x02Username\x02: \x02{0}\x02, \x02Reason\x02: \x02{1}\x02".format(req["username"], reason))
 
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):
