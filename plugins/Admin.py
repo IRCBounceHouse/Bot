@@ -273,6 +273,7 @@ def accept(bot, event, args):
     for name in bot.manager.connections["znc"]:
         if name.lower() == server.lower():
             server = name
+            break
     else:
         bot.reply(event, "Error: invalid server")
         return
