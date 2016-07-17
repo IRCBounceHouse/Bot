@@ -12,7 +12,7 @@ def request(bot, event, args):
         bot.reply(event, "\x02For SSL\x02: add a + before the port (e.g +6697)")
         bot.reply(event, "\x02Terms of Service\x02: https://SuperBNC.com/tos")
         bot.reply(event, "To request by email, see \x02!emailreq\x02. If the request "
-            "if for this network (\x02{0}\x02), also see \x02!easyreq\x02".format(bot.name))
+            "is for this network (\x02{0}\x02), also see \x02!easyreq\x02".format(bot.name))
         return
     args = args.split(" ")
     username = args[0]
