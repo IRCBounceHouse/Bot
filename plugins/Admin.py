@@ -250,7 +250,7 @@ def pending(bot, event, args):
         reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
         bot.reply(event, ", ".join(reqdata))
 
-@utils.add_cmd
+@utils.add_cmd(perms="admin")
 def accept(bot, event, args):
     if len(args.split(" ")) < 2:
         bot.reply(event, "!accept <id> <server>")
@@ -292,7 +292,7 @@ def accept(bot, event, args):
         "\x02Username\x02: \x02{0}\x02, \x02Network\x02: \x02{1}\x02, \x02Server\x02: \x02{2}\x02, "
         "\x02Accepted by\x02: \x02{3}\x02".format(req["username"], net["name"], server, event.source.nick))
 
-@utils.add_cmd
+@utils.add_cmd(perms="admin")
 def reject(bot, event, args):
     if len(args.split(" ")) < 2:
         bot.reply(event, "!reject <id> <reason>")
