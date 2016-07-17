@@ -55,7 +55,7 @@ def request(bot, event, args):
     if not "@" in email:
         bot.reply(event, "\x02Error\x02: Invalid email specified")
         return
-    requsers = bot.manager.requestdb.get_by_user(username):
+    requsers = bot.manager.requestdb.get_by_user(username)
     if requsers:
         for requser in requsers:
             if requser["status"] != "rejected":
