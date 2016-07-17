@@ -67,7 +67,7 @@ class RequestDB(object):
     def add(self, user, email, src, server, port, net):
         c = self.db.cursor()
         c.execute("""INSERT INTO requests (username, email, source, server,
-            port, key, ircnet) VALUES (?, ?, ?, ?, ?, ?)""", (user, email,
+            port, ircnet) VALUES (?, ?, ?, ?, ?, ?)""", (user, email,
             src, server, port, net))
         self.db.commit()
         c.close()
