@@ -77,6 +77,8 @@ class RequestDB(object):
         if not req:
             return False
         c = self.db.cursor()
+        if req["status"] != "unverified":
+            return False
         c.execute("""UPDATE requests SET status = "pending",
             verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
         self.db.commit()
@@ -284,7 +286,7 @@ class VerifyDB(object):
             return False
         c = self.db.cursor()
         c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",
-            (key, cmd, actid))
+            (key, cmd, int(actid)))
         c.close()
         return True
 
