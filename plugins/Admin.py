@@ -286,7 +286,7 @@ def accept(bot, event, args):
             bot.manager.add_server(server, req["username"], net["name"], srv["address"], srv["port"])
     else:
         bot.manager.add_server(server, req["username"], net["name"], req["server"], req["port"])
-    bot.manager.mail.accept(req["email"], bot.manager.connections["znc"][server]["host"],
+    bot.manager.mail.accept(req["email"], bot.manager.connections["znc"][server].host,
         req["username"], passwd, net["name"])
     bot.manager.connections["irc"][req["ircnet"]].msg("#SuperBNC", "\x02\x033Request ACCEPTED\x0f. "
         "\x02Username\x02: \x02{0}\x02, \x02Network\x02: \x02{1}\x02, \x02Server\x02: \x02{2}\x02, "
