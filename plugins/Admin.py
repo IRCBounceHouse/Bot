@@ -237,7 +237,7 @@ def addusernet(bot, event, args):
 @utils.add_cmd(perms="admin")
 def pending(bot, event, args):
     reqs = bot.manager.requestdb.get_pending()
-    if not req:
+    if not reqs:
         bot.reply(event, "No requests are currently pending")
         return
     for req in reqs:
