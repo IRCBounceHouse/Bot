@@ -6,7 +6,8 @@ class RequestDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "requests.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path, check_same_thread=False)
+        self.db = sqlite3.connect(self.path, check_same_thread=False,
+            isolation_level=None)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
@@ -26,7 +27,6 @@ class RequestDB(object):
                 reason TEXT DEFAULT NULL,
                 bncserver TEXT DEFAULT NULL
             )""")
-            self.db.commit()
             c.close()
 
     def get_by_id(self, reqid):
@@ -69,7 +69,6 @@ class RequestDB(object):
         c.execute("""INSERT INTO requests (username, email, source, server,
             port, ircnet) VALUES (?, ?, ?, ?, ?, ?)""", (user, email,
             src, server, port, net))
-        self.db.commit()
         c.close()
 
     def verify(self, reqid):
@@ -81,7 +80,6 @@ class RequestDB(object):
             return False
         c.execute("""UPDATE requests SET status = "pending",
             verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
-        self.db.commit()
         c.close()
         return True
 
@@ -93,7 +91,6 @@ class RequestDB(object):
         c.execute("""UPDATE requests SET status = "accepted", bncserver = ?,
             decided_at = CURRENT_TIMESTAMP, decided_by = ? WHERE id = ?""",
             (bncserver, source, req["id"]))
-        self.db.commit()
         c.close()
         return True
 
@@ -104,7 +101,6 @@ class RequestDB(object):
         c = self.db.cursor()
         c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP,
             decided_by = ?, reason = ? WHERE id = ?""", (source, reason, req["id"]))
-        self.db.commit()
         c.close()
         return True
 
@@ -119,7 +115,8 @@ class NetworkDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "networks.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path, check_same_thread=False)
+        self.db = sqlite3.connect(self.path, check_same_thread=False,
+            isolation_level=None)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
@@ -147,7 +144,6 @@ class NetworkDB(object):
                 port TEXT NOT NULL,
                 network_id NOT NULL
             )""")
-            self.db.commit()
             c.close()
 
     def get_net_by_id(self, netid):
@@ -188,7 +184,6 @@ class NetworkDB(object):
             return False
         c = self.db.cursor()
         c.execute("INSERT INTO networks (name) VALUES (?)", (name,))
-        self.db.commit()
         c.close()
         return True
 
@@ -198,7 +193,6 @@ class NetworkDB(object):
         c = self.db.cursor()
         c.execute("INSERT INTO servers (address, network_id) VALUES (?, ?)",
             (addr, netid))
-        self.db.commit()
         c.close()
         return True
 
@@ -212,7 +206,6 @@ class NetworkDB(object):
             return False
         c.execute("INSERT INTO defaults (address, port, network_id) VALUES (?, ?, ?)",
             (addr, port, netid))
-        self.db.commit()
         c.close()
         return True
 
@@ -224,7 +217,6 @@ class NetworkDB(object):
             suspendrson = ?, suspended_at = CURRENT_TIMESTAMP,
             suspend_expires = datetime(CURRENT_TIMESTAMP, ?) WHERE id = ?""",
             (stype, reason, "+"+expires, netid))
-        self.db.commit()
         c.close()
         return True
 
@@ -233,7 +225,6 @@ class NetworkDB(object):
             return False
         c = self.db.cursor()
         c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", (netid,))
-        self.db.commit()
         c.close()
         return True
 
@@ -249,7 +240,6 @@ class NetworkDB(object):
         c = self.db.cursor()
         c.execute("""UPDATE networks SET banned = 1, bantype = ?, banrson = ?,
             banned_at = CURRENT_TIMESTAMP WHERE id = ?""", (btype, reason, netid))
-        self.db.commit()
         c.close()
         return True
 
@@ -258,7 +248,6 @@ class NetworkDB(object):
             return False
         c = self.db.cursor()
         c.execute("UPDATE networks SET suspended = 0 WHERE id = ?", (netid,))
-        self.db.commit()
         c.close()
         return True
 
@@ -267,7 +256,8 @@ class VerifyDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "verify.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path, check_same_thread=False)
+        self.db = sqlite3.connect(self.path, check_same_thread=False,
+            isolation_level=None)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
@@ -278,7 +268,6 @@ class VerifyDB(object):
                 action_id INT NOT NULL,
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
             )""")
-            self.db.commit()
             c.close()
 
     def add(self, key, cmd, actid):
@@ -287,7 +276,6 @@ class VerifyDB(object):
         c = self.db.cursor()
         c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",
             (key, cmd, actid))
-        self.db.commit()
         c.close()
         return True
 
