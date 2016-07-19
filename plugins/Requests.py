@@ -22,7 +22,7 @@ def request(bot, event, args):
             bot.reply(error, "\x02Error\x02: Unknown network or no port specified")
             return
         try:
-            socket.getaddrinfo(args[1])
+            socket.getaddrinfo(args[1], None)
             server = args[1]
         except socket.gaierror:
             bot.reply(event, "\x02Error\x02: Invalid server specified")
