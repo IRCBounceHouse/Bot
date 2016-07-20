@@ -80,7 +80,7 @@ class Mail(object):
 
         {0}
 
-        If you would like to discuss this, please email us at support@superbnc.com
+        If you would like to discuss this, please email us at support@superbnc.com or join one of our channels (see https://superbnc.com/channels/ for a list)
 
         Regards,
         SuperBNC Team
