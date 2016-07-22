@@ -19,7 +19,7 @@ def request(bot, event, args):
     net = bot.manager.networkdb.get_net_by_name(args[1])
     if not net:
         if len(args) < 4:
-            bot.reply(error, "\x02Error\x02: Unknown network or no port specified")
+            bot.reply(event, "\x02Error\x02: Unknown network or no port specified")
             return
         try:
             socket.getaddrinfo(args[1], None)
