@@ -14,7 +14,7 @@
         ]
       }
     },
-  }
+  },
   "znc": {
     "Aegir": {
       "host": "*.superbnc.com",
@@ -23,7 +23,7 @@
       "pass": "",
       "ssl": true
     }
-  }
+  },
   "smtp": {
     "host": "",
     "port": 587,

@@ -1,4 +1,5 @@
 import socket
+import re
 
 import utils
 
@@ -17,6 +18,9 @@ def request(bot, event, args):
     args = args.split(" ")
     username = args[0]
     net = bot.manager.networkdb.get_net_by_name(args[1])
+    if not re.fullmatch("^[a-zA-Z][a-zA-Z@._\-]+$", username):
+        bot.reply(event, "\x02Error\x02: Invalid username.")
+        return
     if not net:
         if len(args) < 4:
             bot.reply(event, "\x02Error\x02: Unknown network or no port specified")
