@@ -104,7 +104,7 @@ def netsuspend(bot, event, args):
         bot.reply(event, "Error: invalid unit of time")
         return
     net = bot.manager.networkdb.get_net_by_name(netname)
-    if not name:
+    if not net:
         bot.reply(event, "Error: invalid network")
         return
     time = " ".join([time, unit])
@@ -241,7 +241,7 @@ def pending(bot, event, args):
         bot.reply(event, "No requests are currently pending")
         return
     for req in reqs:
-        net = bot.manager.networkdb.get_net_by_server(req["server"])
+        net = bot.manager.networkdb.get_net_by_server(req["server"]) or {"name": "Unknown"}
         reqdata = []
         reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
         reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
