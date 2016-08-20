@@ -248,6 +248,7 @@ def pending(bot, event, args):
         reqdata.append("\x02Server\x02: \x02{0}\x02 [\x02{1}\x02]".format(req["server"], net["name"]))
         reqdata.append("\x02Email\x02: \x02{0}\x02".format(req["email"]))
         reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
+        reqdata.append("\x02Requested on\x02: \x02{0}\x02".format(req["ircnet"]))
         bot.reply(event, ", ".join(reqdata))
 
 @utils.add_cmd(perms="admin")

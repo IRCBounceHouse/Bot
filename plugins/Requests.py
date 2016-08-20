@@ -107,6 +107,15 @@ def verify(bot, event, args):
         bot.reply(event, "\x02Your email has now been verified!\x02 Please wait for a staff member "
             "to process your request. You can check the status of your request by using "
             "\x02!check {0}\x02".format(req["username"]))
+        net = bot.manager.networkdb.get_net_by_server(req["server"]) or {"name": "Unknown"}
+        reqdata = []
+        reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
+        reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
+        reqdata.append("\x02Server\x02: \x02{0}\x02 [\x02{1}\x02]".format(req["server"], net["name"]))
+        reqdata.append("\x02Email\x02: \x02{0}\x02".format(req["email"]))
+        reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
+        reqdata.append("\x02Requested on\x02: \x02{0}\x02".format(req["ircnet"]))
+        bot.manager.adminbot.msg("#SuperBNC-Staff", "\x02NEW REQUEST\x02: {0}".format(", ".join(reqdata)))
     bot.manager.verifydb.used(verifykey)
 
 @utils.add_cmd
