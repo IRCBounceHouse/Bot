@@ -38,7 +38,16 @@ def request(bot, event, args):
             bot.reply(event, "\x02Error\x02: Invalid port specified")
             return
         email = args[3]
+        net = bot.manager.networkdb.get_net_by_server(args[1])
     else:
+        defaults = bot.manager.networkdb.get_net_defaults(net["id"])
+        if not defaults:
+            bot.reply(event, "\x02Error\x02: No default server could be found")
+            return
+        server = defaults[0]["address"]
+        port = "default"
+        email = args[2]
+    if net:
         if net["suspended"] > 0:
             bot.reply(event, "The \x02{0}\x02 network is \x02SUSPENDED\x02. \x02Reason\x02: "
                 "\x02{1}\x02 issues: \x02{2}\x02".format(net["name"], net["suspendtype"],
@@ -49,13 +58,6 @@ def request(bot, event, args):
                 "\x02{1}\x02 issues: \x02{2}\x02".format(net["name"], net["bantype"],
                 net["banrson"]))
             return
-        defaults = bot.manager.networkdb.get_net_defaults(net["id"])
-        if not defaults:
-            bot.reply(event, "\x02Error\x02: No default server could be found")
-            return
-        server = defaults[0]["address"]
-        port = "default"
-        email = args[2]
     if "@" not in email:
         bot.reply(event, "\x02Error\x02: Invalid email specified")
         return
