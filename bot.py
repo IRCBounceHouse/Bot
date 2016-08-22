@@ -189,7 +189,7 @@ class BNCBotManager(object):
                         self.manager.bot_notice(
                             "The \x02{0}\x02 server appears to be back \x02\x033UP\x0f.".format(self.name))
                 self.connected = True
-            except socket.error:
+            except (socket.error, BrokenPipeError):
                 self.handle_disconnect(send_notice=False)
             self.send("PASS {0}".format(self.passwd))
             self.send("USER {0} * * :{0}".format(self.user))
