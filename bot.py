@@ -209,7 +209,7 @@ class BNCBotManager(object):
                 part = self.socket.recv(2048)
                 part = part.decode()
                 data += part
-            return data.splitlines()
+            return data.strip().split("\r\n")
 
         def quit(self, message=None):
             if message:
