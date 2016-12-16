@@ -12,7 +12,6 @@ import os
 
 from mail import Mail
 import databases
-import webhooks
 import utils
 
 class BNCBotManager(object):
@@ -20,7 +19,6 @@ class BNCBotManager(object):
     def __init__(self, conf):
         self.config = conf
         self.connections = {
-            "irc": {},
             "znc": {}
         }
         self.threads = []
@@ -31,22 +29,8 @@ class BNCBotManager(object):
         self.reloadplugins()
         self.mail = Mail(self.config["smtp"])
         self.requestdb = databases.RequestDB()
-        self.networkdb = databases.NetworkDB()
         self.verifydb = databases.VerifyDB()
-        for name, server in self.config["irc"].items():
-            bot = self.BNCBot(
-                name=name,
-                conntype="IRC",
-                host=self.config["zncaddr"],
-                port=self.config["zncport"],
-                user="bot/{0}".format(name),
-                passwd=self.config["zncpass"],
-                use_ssl=self.config["zncssl"],
-                conf=server
-            )
-            self.connections["irc"][name] = bot
-            if server.get("admin"):
-                self.adminbot = bot
+        bot = self.BNCBot
         for name, server in self.config["znc"].items():
             self.connections["znc"][name] = self.BNCBot(
                 name=name,
@@ -58,12 +42,8 @@ class BNCBotManager(object):
                 use_ssl=server["ssl"],
                 conf=server
             )
-        for name, bot in self.connections["irc"].items():
-            print("Starting IRC connection to {0}".format(name))
-            t = threading.Thread(target=bot.run, args=(self,))
-            t.daemon = True
-            t.start()
-            self.threads.append(t)
+            if server.get("admin"):
+                self.adminbot = bot
         for name, bot in self.connections["znc"].items():
             print("Starting ZNC connection to {0}".format(name))
             t = threading.Thread(target=bot.run, args=(self,))
@@ -118,47 +98,6 @@ class BNCBotManager(object):
                 print("New plugin: {0}".format(str(plugin)))
                 self.events = utils.events + self.events
 
-    def global_notice(self, source, msg):
-        msgtext = "[\x02GLOBAL NOTICE\x02] (from \x02{0}\x02) {1}".format(source, msg)
-        for bot in self.connections["irc"].values():
-            bot.msg("#SuperBNC", msgtext)
-        for bot in self.connections["znc"].values():
-            bot.msg("*status", "broadcast {0}".format(msgtext))
-
-    def rooms_notice(self, source, msg):
-        msgtext = "[\x02ROOMS NOTICE\x02] (from \x02{0}\x02) {1}".format(source, msg)
-        for bot in self.connections["irc"].values():
-            bot.msg("#SuperBNC", msgtext)
-
-    def bot_notice(self, msg):
-        msgtext = "[\x02BOT NOTICE\x02] {0}".format(msg)
-        for bot in self.connections["irc"].values():
-            bot.msg("#SuperBNC", msgtext)
-
-    def add_user(self, server, username, password):
-        if server not in self.connections["znc"]:
-            return False
-        self.connections["znc"][server].msg("*controlpanel", "AddUser {0} {1}".format(
-            username, password))
-        return True
-
-    def add_net(self, server, username, network):
-        if server not in self.connections["znc"]:
-            return False
-        self.connections["znc"][server].msg("*controlpanel", "AddNetwork {0} {1}".format(
-            username, network))
-        if network in self.connections["irc"]:
-            self.connections["znc"][server].msg("*controlpanel",
-                "AddChan {0} {1} #SuperBNC".format(username, network))
-        return True
-
-    def add_server(self, server, username, network, host, port):
-        if server not in self.connections["znc"]:
-            return False
-        self.connections["znc"][server].msg("*controlpanel",
-            "AddServer {0} {1} {2} {3}".format(username, network, host, port))
-        return True
-
     class BNCBot(object):
 
         def __init__(self, name, conntype, host, port, user, passwd, use_ssl, conf):
@@ -183,8 +122,7 @@ class BNCBotManager(object):
                 self.socket.connect((self.host, self.port))
                 if self.down:
                     self.down = False
-                    self.manager.adminbot.msg("#SuperBNC-Staff",
-                        "\x02Connected\x02: \x02{0}\x02 (\x02Socket\x02)".format(self.name))
+                    self.manager.adminbot.msg("#IRCBounceHouse-dev", "\x02Connected\x02: \x02{0}\x02 (\x02Socket\x02)".format(self.name))
                     if self.type == "ZNC":
                         self.manager.bot_notice(
                             "The \x02{0}\x02 server appears to be back \x02\x033UP\x0f.".format(self.name))
@@ -194,6 +132,7 @@ class BNCBotManager(object):
             self.send("PASS {0}".format(self.passwd))
             self.send("USER {0} * * :{0}".format(self.user))
             self.send("NICK {0}".format(self.user))
+            self.send("MODE {0} +B".format(self.user))
             self.loop()
 
         def send(self, text):
@@ -259,8 +198,7 @@ class BNCBotManager(object):
             self.down = True
             print("{0} connection to {1} died, reconnecting...".format(self.type.upper(), self.name))
             if send_notice:
-                self.manager.adminbot.msg("#SuperBNC-Staff",
-                    "\x02Disconnect detected\x02: \x02{0}\x02 (\x02Socket\x02)".format(self.name))
+                self.manager.adminbot.msg("#IRCBounceHouse-dev", "\x02Disconnect detected\x02: \x02{0}\x02 (\x02Socket\x02)".format(self.name))
                 if self.type == "ZNC":
                     self.manager.bot_notice("The \x02{0}\x02 server appears to be \x02\x034DOWN\x0f.".format(self.name))
             time.sleep(10)
@@ -274,7 +212,6 @@ class BNCBotManager(object):
                     self.handle_disconnect()
                 for line in data:
                     self.manager.requestdb.expires()
-                    self.manager.networkdb.expires()
                     self.manager.verifydb.expires()
                     event = utils.Event(line)
                     t = threading.Thread(target=self.handle_event, args=(event,))
@@ -299,15 +236,13 @@ class BNCBotManager(object):
                 self.ping_thread.daemon = True
                 self.ping_thread.start()
             elif event.type == "PRIVMSG":
-                if str(event.source) == "*status!bnc@superbnc.com":
+                if str(event.source) == "*status!znc@znc.in":
                     if event.arguments[0].startswith("Disconnected from IRC.") and not self.down:
                         self.down = True
-                        self.manager.adminbot.msg("#SuperBNC-Staff",
-                            "\x02Disconnect detected\x02: \x02{0}\x02 (\x02ZNC\x02)".format(self.name))
+                        self.manager.adminbot.msg("#IRCBounceHouse-dev", "\x02Disconnect detected\x02: \x02{0}\x02 (\x02ZNC\x02)".format(self.name))
                     elif event.arguments[0] == "Connected!" and self.down:
                         self.down = False
-                        self.manager.adminbot.msg("#SuperBNC-Staff",
-                            "\x02Connected\x02: \x02{0}\x02 (\x02ZNC\x02)".format(self.name))
+                        self.manager.adminbot.msg("#IRCBounceHouse-dev", "\x02Connected\x02: \x02{0}\x02 (\x02ZNC\x02)".format(self.name))
                 if len(event.arguments[0].split(" ")) > 1:
                     command, args = event.arguments[0].split(" ", 1)
                 else:
@@ -352,8 +287,7 @@ if __name__ == "__main__":
         config = json.load(configfile)
     if not os.path.exists(os.path.join(os.getcwd(), "data")):
         os.mkdir(os.path.join(os.getcwd(), "data"))
-    webhooks.app.config["GITHUB_WEBHOOKS_KEY"] = config["github_secret"]
-    t = threading.Thread(target=webhooks.app.run, args=("0.0.0.0", 8163))
+    t = threading.Thread(args=("0.0.0.0", 8163))
     t.daemon = True
     t.start()
     manager = BNCBotManager(config)

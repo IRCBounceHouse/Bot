@@ -1,31 +1,18 @@
-{
-  "zncaddr": "*.superbnc.com",
-  "zncport": 5000,
-  "zncpass": "",
-  "zncssl": true,
-  "github_secret": "",
-  "irc": {
-    "freenode": {
-      "admin": true,
-      "perms": {
-        "admin": [
-          "*!*@*.staff.superbnc.com",
-          "*!*@staff.superbnc.com"
-        ]
-      }
-    },
-  },
-  "znc": {
-    "Aegir": {
-      "host": "*.superbnc.com",
-      "port": 5000,
+"znc": {
+    "Spotchat": {
+      "host": "ircbouncehouse.com",
+      "port": 6697,
       "user": "",
       "pass": "",
       "ssl": true
+      "perms": {
+        "admin": [
+          "*!*@spotchat/staff/devnull",
+          "*!*@spotchat/staff/r00t" ]
     }
   },
   "smtp": {
-    "host": "",
+    "host": "localhost",
     "port": 587,
     "user": "",
     "pass": "",

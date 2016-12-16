@@ -39,51 +39,49 @@ class Mail(object):
 
     def verify(self, toaddr, code):
         msg = """
-        Hi,
+Hi,
 
-        To confirm your SuperBNC account request, send the following in one of our channels.
+To confirm your IRCBounceHouse account request, send the following in our channel:
 
-        !verify {0}
+!verify {0}
 
-        Thanks for choosing SuperBNC.
+Thanks for choosing IRCBounceHouse.
 
-        Regards,
-        SuperBNC Team
-        support@superbnc.com
+Regards,
+IRCBounceHouse Team
+admin@ircbouncehouse.com
         """.format(code)
-        self.send(toaddr, "SuperBNC account verification", msg)
+        self.send(toaddr, "IRCBounceHouse account verification", msg)
 
-    def accept(self, toaddr, server, user, passwd, net):
+    def accept(self, toaddr, user, passwd):
         msg = """
-        Hi,
+Hi,
 
-        Your SuperBNC account request has been accepted. Your account details are:
+Your IRCBounceHouse account request has been accepted. Your account details are:
 
-        BNC Server: {0}
-        Username: {1}
-        Password: {2}
-        IRC Network: {3}
+Username: {0}
+Password: {1}
 
-        Thanks for choosing SuperBNC.
+Please change your password once you login. Thanks for choosing IRCBounceHouse.
 
-        Regards,
-        SuperBNC Team
-        support@superbnc.com
-        """.format(server, user, passwd, net)
-        self.send(toaddr, "Your SuperBNC account details", msg)
+Regards,
+IRCBounceHouse Team
+admin@ircbouncehouse.com
+        """.format(user, passwd)
+        self.send(toaddr, "Your IRCBounceHouse account details", msg)
 
     def reject(self, toaddr, reason):
         msg = """
-        Hi,
+Hi,
 
-        Your SuperBNC account request has been rejected. The reason given was:
+Your IRCBounceHouseC account request has been rejected. The reason given was:
 
-        {0}
+{0}
 
-        If you would like to discuss this, please email us at support@superbnc.com or join one of our channels (see https://superbnc.com/channels/ for a list)
+If you would like to discuss this, please email us at admin@ircbouncehouse.com or join #IRCBounceHouse@irc.spotchat.org
 
-        Regards,
-        SuperBNC Team
-        support@superbnc.com
+Regards,
+IRCBounceHouse Team
+admin@ircbouncehouse.com
         """.format(reason)
-        self.send(toaddr, "SuperBNC request rejected", msg)
+        self.send(toaddr, "IRCBounceHouse request rejected", msg)

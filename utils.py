@@ -34,21 +34,6 @@ def genpasswd():
     alphanumeric = string.ascii_letters + string.digits
     return "".join([random.choice(alphanumeric) for _ in range(16)])
 
-def banmask(net, hostmask):
-    nm = NickMask(hostmask)
-    if net in ["freenode", "Stuxnet"]:
-        if re.match("(gateway|nat|conference)/.*", nm.host):
-            if "/irccloud.com/" in nm.host:
-                nm.user = "*{0}".format(nm.user[1:])
-            elif nm.host.startswith("gateway/web/"):
-                return "*!{0}@gateway/web/*".format(nm.user)
-            return "*!{0}@{1}/*".format(nm.user, "/".join(nm.host.split("/")[:-1]))
-        elif "/" in nm.host:
-            return "*!*@{0}".format(nm.host)
-    if nm.user.startswith("~"):
-        return "*!*@{0}".format(nm.host)
-    return "*!{0}@{1}".format(nm.user, nm.host)
-
 class Event(object):
 
     def __init__(self, raw):
