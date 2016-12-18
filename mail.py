@@ -61,10 +61,11 @@ Your IRCBounceHouse account request has been accepted. Your account details are:
 
 Username: {0}
 Password: {1}
+Login to your account here: https://ircbouncehouse.com:8080/ - Please change your password once you login.
 
-Please change your password once you login. Thanks for choosing IRCBounceHouse.
+Our IRC ports are: 6667 (Unencrypted), 6697 (SSL).
+Thanks for choosing IRCBounceHouse.
 
-Regards,
 IRCBounceHouse Team
 admin@ircbouncehouse.com
         """.format(user, passwd)
@@ -78,7 +79,7 @@ Your IRCBounceHouseC account request has been rejected. The reason given was:
 
 {0}
 
-If you would like to discuss this, please email us at admin@ircbouncehouse.com or join #IRCBounceHouse@irc.spotchat.org
+If you would like to discuss this, please join #IRCBounceHouse@irc.spotchat.org or email us at admin@ircbouncehouse.com
 
 Regards,
 IRCBounceHouse Team
