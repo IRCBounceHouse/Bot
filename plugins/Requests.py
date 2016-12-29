@@ -19,27 +19,26 @@ def request(bot, event, args):
         return
     email = args[1]
     if "@" not in email:
-        bot.reply(event, "\x02Error\x02: Invalid email specified")
+        bot.reply(event, "\x02Error\x02: Invalid email specified.")
         return
     requsers = bot.manager.requestdb.get_by_user(username)
     if requsers:
         for requser in requsers:
             if requser["status"] != "rejected":
-                bot.reply(event, "\x02Error\x02: There is already a request with this username")
+                bot.reply(event, "\x02Error\x02: There is already a request with this username.")
                 return
     reqemails = bot.manager.requestdb.get_by_email(email)
     if reqemails:
         for reqemail in reqemails:
             if reqemail["status"] != "rejected":
-                bot.reply(event, "\x02Error\x02: There is already a request with this email")
+                bot.reply(event, "\x02Error\x02: There is already a request with this email.")
                 return
     bot.manager.requestdb.add(username, email, str(event.source))
     thisreq = bot.manager.requestdb.get_by_email(email)[-1]
     key = utils.genkey()
     bot.manager.verifydb.add(key, "request", thisreq["id"])
     bot.manager.mail.verify(email, key)
-    bot.reply(event, "\x02You have completed the first step!\x02 Please follow the instructions sent to "
-        "the email address you specified to verify your request.")
+    bot.reply(event, "\x02You have completed the first step!\x02 Please follow the instructions sent to the email address you specified to verify your request.")
 
 @utils.add_cmd
 def verify(bot, event, args):
@@ -54,9 +53,7 @@ def verify(bot, event, args):
     if key["command"] == "request":
         bot.manager.requestdb.verify(key["action_id"])
         req = bot.manager.requestdb.get_by_id(key["action_id"])
-        bot.reply(event, "\x02Your email has now been verified!\x02 Please wait for a staff member "
-            "to process your request. You can check the status of your request by using "
-            "\x02!check {0}\x02".format(req["username"]))
+        bot.reply(event, "\x02Your email has now been verified!\x02 Please wait for a staff member to process your request. You can check the status of your request by using \x02!check {0}\x02".format(req["username"]))
         reqdata = []
         reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
         reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
@@ -77,17 +74,13 @@ def check(bot, event, args):
         return
     req = req[-1]
     reply = []
-    reply.append("Request for \x02{0}\x02".format(
-        req["username"]))
+    reply.append("Request for \x02{0}\x02".format(req["username"]))
     if req["status"] == "unverified":
-        reply.append("is currently \x02UNVERIFIED\x02. Please check your email to "
-            "verify this request")
+        reply.append("is currently \x02UNVERIFIED\x02. Please check your email to verify this request.")
     elif req["status"] == "pending":
-        reply.append("is currently \x02PENDING\x02. Please wait for a staff member "
-            "to process this request")
+        reply.append("is currently \x02PENDING\x02. Please wait for a staff member to process this request.")
     elif req["status"] == "accepted":
-        reply.append("was \x02\x033ACCEPTED\x0f. Please check your "
-            "email for account details and further instructions")
+        reply.append("was \x02\x033ACCEPTED\x0f. Please check your email for account details and further instructions.")
     elif req["status"] == "rejected":
         reply.append("was \x02\x034REJECTED\x0f. \x02Reason\x02: \x02{0}\x02".format(req["reason"]))
     bot.reply(event, " ".join(reply))

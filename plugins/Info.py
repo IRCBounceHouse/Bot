@@ -13,18 +13,13 @@ def clients(bot, event, args):
         elif client.lower() == "mirc":
             bot.reply(event, "Please see http://wiki.znc.in/MIRC")
         elif client.lower() == "pidgin":
-            bot.reply(event, "We recommend using a different client since Pidgin "
-                "isn't a very good IRC client. If you still wish to use Pidgin, "
-                "please see http://wiki.znc.in/Pidgin and pay special attention "
-                "to http://wiki.znc.in/Pidgin#Channels")
+            bot.reply(event, "We recommend using a different client since Pidgin isn't a very good IRC client. If you still wish to use Pidgin, please see http://wiki.znc.in/Pidgin and pay special attention to http://wiki.znc.in/Pidgin#Channels")
         elif client.lower() == "weechat":
             bot.reply(event, "Please see http://wiki.znc.in/WeeChat")
         else:
-            bot.reply(event, "Please see http://wiki.znc.in/Connecting_to_ZNC and "
-                "http://wiki.znc.in/Category:Clients")
+            bot.reply(event, "Please see http://wiki.znc.in/Connecting_to_ZNC and http://wiki.znc.in/Category:Clients")
     except IndexError:
-        bot.reply(event, "Please see http://wiki.znc.in/Connecting_to_ZNC and "
-            "http://wiki.znc.in/Category:Clients")
+        bot.reply(event, "Please see http://wiki.znc.in/Connecting_to_ZNC and http://wiki.znc.in/Category:Clients")
 
 @utils.add_cmd
 def ports(bot, event, args):
