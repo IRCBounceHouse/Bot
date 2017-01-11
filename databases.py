@@ -6,8 +6,7 @@ class RequestDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "requests.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path, check_same_thread=False,
-            isolation_level=None)
+        self.db = sqlite3.connect(self.path, check_same_thread=False,isolation_level=None)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
@@ -62,8 +61,7 @@ class RequestDB(object):
 
     def add(self, user, email, src):
         c = self.db.cursor()
-        c.execute("""INSERT INTO requests (username, email, source) VALUES (?, ?, ?)""", (user, email,
-            src))
+        c.execute("""INSERT INTO requests (username, email, source) VALUES (?, ?, ?)""", (user, email,src))
         c.close()
 
     def verify(self, reqid):
@@ -83,8 +81,7 @@ class RequestDB(object):
         if not req:
             return False
         c = self.db.cursor()
-        c.execute("""UPDATE requests SET status = "accepted", decided_at = CURRENT_TIMESTAMP, decided_by = ? WHERE id = ?""",
-            (source, req["id"]))
+        c.execute("""UPDATE requests SET status = "accepted", decided_at = CURRENT_TIMESTAMP, decided_by = ? WHERE id = ?""",(source, req["id"]))
         c.close()
         return True
 
@@ -93,15 +90,13 @@ class RequestDB(object):
         if not req:
             return False
         c = self.db.cursor()
-        c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP,
-            decided_by = ?, reason = ? WHERE id = ?""", (source, reason, req["id"]))
+        c.execute("""UPDATE requests SET status = "rejected", decided_at = CURRENT_TIMESTAMP,decided_by = ?, reason = ? WHERE id = ?""", (source, reason, req["id"]))
         c.close()
         return True
 
     def expires(self):
         c = self.db.cursor()
-        c.execute("""DELETE FROM requests WHERE status = "unverified" AND
-            datetime(created_at, "+1 day") < CURRENT_TIMESTAMP""")
+        c.execute("""DELETE FROM requests WHERE status = "unverified" AND datetime(created_at, "+1 day") < CURRENT_TIMESTAMP""")
         c.close()
 
 class VerifyDB(object):
@@ -109,8 +104,7 @@ class VerifyDB(object):
     def __init__(self):
         self.path = os.path.join(os.getcwd(), "data", "verify.db")
         exists = os.path.exists(self.path)
-        self.db = sqlite3.connect(self.path, check_same_thread=False,
-            isolation_level=None)
+        self.db = sqlite3.connect(self.path, check_same_thread=False,isolation_level=None)
         self.db.row_factory = sqlite3.Row
         if not exists:
             c = self.db.cursor()
@@ -127,8 +121,7 @@ class VerifyDB(object):
         if self.get_by_key(key):
             return False
         c = self.db.cursor()
-        c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",
-            (key, cmd, actid))
+        c.execute("INSERT INTO keys (key, command, action_id) VALUES (?, ?, ?)",(key, cmd, actid))
         c.close()
         return True
 
