@@ -41,6 +41,7 @@ def accept(bot, event, args):
     passwd = utils.genpasswd()
     bot.msg("*controlpanel", "AddUser {0} {1}".format(req["username"], passwd))
     bot.msg("*controlpanel", "Set MaxNetworks {0} 10".format(req["username"]))
+    bot.msg("*controlpanel", "Set DenySetBindHost {0} true".format(req["username"]))
     bot.manager.mail.accept(req["email"], req["username"], passwd)
     bot.msg("#IRCBounceHouse", "\x02\x033Request ACCEPTED\x0f. \x02Username\x02: \x02{0}\x02".format(req["username"]))
 
