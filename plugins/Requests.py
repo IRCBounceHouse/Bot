@@ -27,6 +27,9 @@ def request(bot, event, args):
             if requser["status"] != "rejected":
                 bot.reply(event, "\x02Error\x02: There is already a request with this username.")
                 return
+            if requser["status"] == "deleted":
+                bot.reply(event, "\x02Error\x02: This username belonged to a deleted user. Ask an admin to release the username to you.")
+                return
     reqemails = bot.manager.requestdb.get_by_email(email)
     if reqemails:
         for reqemail in reqemails:

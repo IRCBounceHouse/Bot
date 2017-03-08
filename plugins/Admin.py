@@ -62,6 +62,35 @@ def reject(bot, event, args):
     bot.manager.mail.reject(req["email"], reason)
     bot.msg("#IRCBounceHouse", "\x02\x034Request REJECTED\x0f. \x02Username\x02: \x02{0}\x02, \x02Reason\x02: \x02{1}\x02".format(req["username"], reason))
 
+@utils.add_cmd(perms="admin")
+def deluser(bot, event, args):
+    if len(args.split(" ")) < 1:
+        bot.reply(event, "!deluser <username>")
+    username = args[0]
+    req = bot.manager.requestdb.get_by_user(username)
+    if not req:
+        bot.reply(event, "\x02Error\x02: There is no user with that name.")
+        return
+    c = self.db.cursor()
+    c.execute("""UPDATE requests SET status = "deleted", decided_at = CURRENT_TIMESTAMP,decided_by = ? WHERE username = ?""", (source, username])
+    c.close()
+    bot.msg("*controlpanel", "DelUser {0}".format(req["username"]))
+    bot.msg("#IRCBounceHouse-dev", "\x02Username {0} deleted!".format(req["username"]))
+
+@utils.add_cmd(perms="admin")
+def release(bot, event, args):
+    if len(args.split(" ")) < 1:
+        bot.reply(event, "!release <username>")
+    username = args[0]
+    req = bot.manager.requestdb.get_by_user(username)
+    if not req:
+        bot.reply(event, "\x02Error\x02: There is no user with that name.")
+        return
+    c = self.db.cursor()
+    c.execute("""DELETE FROM requests WHERE username = ?""", (username))
+    c.close()
+    bot.msg("#IRCBounceHouse-dev", "\x02Username {0} released!".format(req["username"]))
+
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):
     pyenv = Repl({

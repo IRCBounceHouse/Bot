@@ -71,8 +71,7 @@ class RequestDB(object):
         c = self.db.cursor()
         if req["status"] != "unverified":
             return False
-        c.execute("""UPDATE requests SET status = "pending",
-            verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
+        c.execute("""UPDATE requests SET status = "pending", verified_at = CURRENT_TIMESTAMP WHERE id = ?""", (req["id"],))
         c.close()
         return True
 
