@@ -72,7 +72,7 @@ def deluser(bot, event, args):
         bot.reply(event, "\x02Error\x02: There is no user with that name.")
         return
     c = self.db.cursor()
-    c.execute("""UPDATE requests SET status = "deleted", decided_at = CURRENT_TIMESTAMP,decided_by = ? WHERE username = ?""", (source, username])
+    c.execute("""UPDATE requests SET status = "deleted", decided_at = CURRENT_TIMESTAMP,decided_by = ? WHERE username = ?""", (source, username))
     c.close()
     bot.msg("*controlpanel", "DelUser {0}".format(req["username"]))
     bot.msg("#IRCBounceHouse-dev", "\x02Username {0} deleted!".format(req["username"]))
