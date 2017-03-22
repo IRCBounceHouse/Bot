@@ -67,6 +67,10 @@ def deluser(bot, event, args):
     if len(args.split(" ")) < 1:
         bot.reply(event, "!deluser <username>")
     username = args[0]
+    req = bot.manager.requestdb.get_by_user(username)
+    if not req:
+        bot.reply(event, "\x02Error\x02: There is no user with that name.")
+        return
     c = self.db.cursor()
     c.execute("""UPDATE requests SET status = "deleted", decided_at = CURRENT_TIMESTAMP,decided_by = ? WHERE username = ?""", (source, username))
     c.close()
@@ -78,6 +82,10 @@ def release(bot, event, args):
     if len(args.split(" ")) < 1:
         bot.reply(event, "!release <username>")
     username = args[0]
+    req = bot.manager.requestdb.get_by_user(username)
+    if not req:
+        bot.reply(event, "\x02Error\x02: There is no user with that name.")
+        return
     c = self.db.cursor()
     c.execute("""DELETE FROM requests WHERE username = ?""", (username))
     c.close()
