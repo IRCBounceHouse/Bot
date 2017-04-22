@@ -17,10 +17,10 @@ def pending(bot, event, args):
         return
     for req in reqs:
         reqdata = []
-        reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
-        reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
-        reqdata.append("\x02Email\x02: \x02{0}\x02".format(req["email"]))
-        reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
+        reqdata.append("\x02ID\x02: {0}".format(req["id"]))
+        reqdata.append("\x02Username\x02: {0}".format(req["username"]))
+        reqdata.append("\x02Email\x02: {0}".format(req["email"]))
+        reqdata.append("\x02Source\x02: {0}".format(req["source"]))
         bot.reply(event, ", ".join(reqdata))
 
 @utils.add_cmd(perms="admin")
@@ -43,7 +43,7 @@ def accept(bot, event, args):
     bot.msg("*controlpanel", "Set MaxNetworks {0} 10".format(req["username"]))
     bot.msg("*controlpanel", "Set DenySetBindHost {0} true".format(req["username"]))
     bot.manager.mail.accept(req["email"], req["username"], passwd)
-    bot.msg("#IRCBounceHouse", "\x02\x033Request ACCEPTED\x0f. \x02Username\x02: \x02{0}\x02".format(req["username"]))
+    bot.msg("#IRCBounceHouse", "\x02\x033Request ACCEPTED\x0f. \x02Username\x02: {0}".format(req["username"]))
 
 @utils.add_cmd(perms="admin")
 def reject(bot, event, args):
@@ -60,7 +60,7 @@ def reject(bot, event, args):
         return
     bot.manager.requestdb.reject(req["id"], event.source.nick, reason)
     bot.manager.mail.reject(req["email"], reason)
-    bot.msg("#IRCBounceHouse", "\x02\x034Request REJECTED\x0f. \x02Username\x02: \x02{0}\x02, \x02Reason\x02: \x02{1}\x02".format(req["username"], reason))
+    bot.msg("#IRCBounceHouse", "\x02\x034Request REJECTED\x0f. \x02Username\x02: {0}, \x02Reason\x02: {1}".format(req["username"], reason))
 
 @utils.add_cmd(command=">>", perms="admin")
 def pyeval(bot, event, args):

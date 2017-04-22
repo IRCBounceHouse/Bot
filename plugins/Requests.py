@@ -55,10 +55,10 @@ def verify(bot, event, args):
         req = bot.manager.requestdb.get_by_id(key["action_id"])
         bot.reply(event, "\x02Your email has now been verified!\x02 Please wait for a staff member to process your request. You can check the status of your request by using \x02!check {0}\x02".format(req["username"]))
         reqdata = []
-        reqdata.append("\x02ID\x02: \x02{0}\x02".format(req["id"]))
-        reqdata.append("\x02Username\x02: \x02{0}\x02".format(req["username"]))
-        reqdata.append("\x02Email\x02: \x02{0}\x02".format(req["email"]))
-        reqdata.append("\x02Source\x02: \x02{0}\x02".format(req["source"]))
+        reqdata.append("\x02ID\x02: {0}".format(req["id"]))
+        reqdata.append("\x02Username\x02: {0}".format(req["username"]))
+        reqdata.append("\x02Email\x02: {0}".format(req["email"]))
+        reqdata.append("\x02Source\x02: {0}".format(req["source"]))
         bot.msg("#IRCBounceHouse-dev", "\x02NEW REQUEST\x02: {0}".format(", ".join(reqdata)))
     bot.manager.verifydb.used(verifykey)
 
@@ -82,5 +82,5 @@ def check(bot, event, args):
     elif req["status"] == "accepted":
         reply.append("was \x02\x033ACCEPTED\x0f. Please check your email for account details and further instructions.")
     elif req["status"] == "rejected":
-        reply.append("was \x02\x034REJECTED\x0f. \x02Reason\x02: \x02{0}\x02".format(req["reason"]))
+        reply.append("was \x02\x034REJECTED\x0f. \x02Reason\x02: {0}".format(req["reason"]))
     bot.reply(event, " ".join(reply))
